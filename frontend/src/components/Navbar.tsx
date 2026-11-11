@@ -7,13 +7,10 @@ import {
   CalendarDays,
   BarChart3,
   Sparkles,
-  Volume2,
-  VolumeX,
   HeartHandshake,
   Compass,
 } from 'lucide-react';
 import { Patient } from '@backend/types.ts';
-import { audio } from './AudioService.ts';
 import { ClerkAuthStatus } from './ClerkAuthStatus.tsx';
 import { isClerkConfigured } from '../utils/clerkConfig.ts';
 
@@ -28,9 +25,6 @@ interface NavbarProps {
   patients: Patient[];
   selectedPatientId: string;
   onSelectPatient: (patientId: string) => void;
-  onTriggerSensoryBreak: () => void;
-  isSoundMuted: boolean;
-  onToggleSound: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -42,9 +36,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   patients,
   selectedPatientId,
   onSelectPatient,
-  onTriggerSensoryBreak,
-  isSoundMuted,
-  onToggleSound,
 }) => {
   const selectedPatient = patients.find((p) => p.id === selectedPatientId);
 
@@ -58,7 +49,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   const executarCliqueLogo = () => {
-    audio.playSoftTap();
     if (isAutenticado) {
       onAlternarModoVisualizacao('clinico');
       onSelectTab('dashboard');
@@ -112,7 +102,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     key={aba.id}
                     onClick={() => {
-                      audio.playSoftTap();
                       onSelectTab(aba.id);
                     }}
                     className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-xs lg:text-sm transition-all duration-200 cursor-pointer ${
@@ -143,7 +132,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               {isAutenticado && (
                 <button
                   onClick={() => {
-                    audio.playSoftTap();
                     onAlternarModoVisualizacao('clinico');
                   }}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#E8F8F2] text-[#2D6A4F] border border-[#A8E6CF] cursor-pointer"
@@ -164,7 +152,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {/* Botão de Alternar para Página de Apresentação */}
                 <button
                   onClick={() => {
-                    audio.playSoftTap();
                     onAlternarModoVisualizacao('apresentacao');
                   }}
                   title="Ver página de apresentação pública"
@@ -188,7 +175,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <select
                       value={selectedPatientId}
                       onChange={(e) => {
-                        audio.playSoftTap();
                         if (e.target.value === '__add_new__') {
                           onSelectTab('patients');
                         } else {
@@ -210,36 +196,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </select>
                   </div>
                 </div>
-
-                {/* Botão de Pausa Sensorial Imediata */}
-                <button
-                  onClick={() => {
-                    audio.playPop();
-                    onTriggerSensoryBreak();
-                  }}
-                  title="Pausa Sensorial Imediata (Descompressão e Respiração Guiada)"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-[#EDE7F6] hover:bg-[#D1C4E9]/50 text-[#5E35B1] transition-all cursor-pointer ring-1 ring-[#D1C4E9]"
-                  aria-label="Ativar Pausa Sensorial"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#7E57C2]" />
-                  <span className="hidden lg:inline">Pausa Sensorial</span>
-                </button>
               </>
             )}
-
-            {/* Alternador de Som */}
-            <button
-              onClick={onToggleSound}
-              className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-                isSoundMuted
-                  ? 'bg-rose-50 border-rose-200 text-rose-600'
-                  : 'bg-[#F7F3EE] border-[#EDE4DA] text-[#64748B] hover:text-[#1E293B]'
-              }`}
-              title={isSoundMuted ? 'Áudio desativado (silencioso)' : 'Áudio suave ativado'}
-              aria-label={isSoundMuted ? 'Ativar som terapêutico' : 'Silenciar sons'}
-            >
-              {isSoundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </button>
 
             {/* Perfil e Login do Clerk */}
             <ClerkAuthStatus isConfigured={isClerkConfigured()} />
@@ -257,7 +215,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={aba.id}
                   onClick={() => {
-                    audio.playSoftTap();
                     onSelectTab(aba.id);
                   }}
                   className={`flex flex-col items-center py-1.5 px-2.5 rounded-lg whitespace-nowrap ${

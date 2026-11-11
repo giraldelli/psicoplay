@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar, ActiveTab } from './components/Navbar.tsx';
 import { BackgroundDoodles } from './components/BackgroundDoodles.tsx';
-import { SensoryBreakModal } from './components/SensoryBreakModal.tsx';
 import { Rodape } from './components/Rodape.tsx';
 import { audio } from './components/AudioService.ts';
 
@@ -41,8 +40,6 @@ export default function App() {
   const [metricasJogos, setMetricasJogos] = useState<GameMetricRecord[]>([]);
   const [sessoesClinicas, setSessoesClinicas] = useState<SessionRecord[]>([]);
 
-  const [isModalSensorialAberta, setIsModalSensorialAberta] = useState(false);
-  const [isSomSilenciado, setIsSomSilenciado] = useState(false);
   const [jogoAlvoParaAbrir, setJogoAlvoParaAbrir] = useState<string | null>(null);
 
   // Carrega os dados clínicos iniciais do repositório
@@ -56,15 +53,6 @@ export default function App() {
     setMetricasJogos(DataService.getMetrics());
     setSessoesClinicas(DataService.getSessions());
   }, []);
-
-  const executarAlternarSom = () => {
-    const proximoEstado = !isSomSilenciado;
-    setIsSomSilenciado(proximoEstado);
-    audio.setSoundEnabled(!proximoEstado);
-    if (!proximoEstado) {
-      audio.playSoftTap();
-    }
-  };
 
   const executarAdicionarPaciente = (
     dadosNovoPaciente: Omit<Patient, 'id' | 'createdAt' | 'sessionsCount' | 'lastSessionDate'>
@@ -157,9 +145,6 @@ export default function App() {
         patients={pacientes}
         selectedPatientId={pacienteSelecionadoId}
         onSelectPatient={(id) => setPacienteSelecionadoId(id)}
-        onTriggerSensoryBreak={() => setIsModalSensorialAberta(true)}
-        isSoundMuted={isSomSilenciado}
-        onToggleSound={executarAlternarSom}
       />
 
       {/* Conteúdo Principal: Página Inicial Pública ou Painel do Terapeuta */}
@@ -246,12 +231,6 @@ export default function App() {
 
         </main>
       )}
-
-      {/* Modal de Emergência para Pausa Sensorial e Descompressão */}
-      <SensoryBreakModal
-        isOpen={isModalSensorialAberta}
-        onClose={() => setIsModalSensorialAberta(false)}
-      />
 
       {/* Rodapé Oficial da Plataforma com Direitos Autorais e Contato do Desenvolvedor */}
       <Rodape />

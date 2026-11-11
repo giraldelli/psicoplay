@@ -131,9 +131,9 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       icone: Activity,
     },
     {
-      titulo: 'Pausa Sensorial Imediata',
+      titulo: 'Acolhimento & Adaptação Neurodivergente',
       descricao:
-        'Botão de emergência sempre à disposição com respiração guiada de 4 tempos para acolher e autorregular a criança em momentos de crise.',
+        'Ambiente planejado com respeito ao ritmo da criança, eliminação de frustrações e foco em reforço positivo contínuo.',
       icone: HeartHandshake,
     },
     {
@@ -220,13 +220,13 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             {/* Garantias de Acessibilidade Sensorial */}
             <div className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-[#64748B] font-semibold">
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#4FA88E]" /> Sem sons estridentes
+                <CheckCircle2 className="w-4 h-4 text-[#4FA88E]" /> Interface 100% silenciosa
               </span>
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#4FA88E]" /> Paleta de cores calmante
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#4FA88E]" /> Pausa sensorial integrada
+                <CheckCircle2 className="w-4 h-4 text-[#4FA88E]" /> Baixa carga cognitiva
               </span>
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#4FA88E]" /> Respeito ao ritmo da criança
