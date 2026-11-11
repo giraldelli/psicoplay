@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Gamepad2,
   Sparkles,
@@ -50,6 +50,14 @@ export const GamesCatalogView: React.FC<GamesCatalogViewProps> = ({
   // Live trackers for active game session
   const [touchesCount, setTouchesCount] = useState(0);
   const [mistakesCount, setMistakesCount] = useState(0);
+
+  const executarRegistrarToque = useCallback(() => {
+    setTouchesCount((anterior) => anterior + 1);
+  }, []);
+
+  const executarRegistrarErro = useCallback(() => {
+    setMistakesCount((anterior) => anterior + 1);
+  }, []);
 
   const gamesList = [
     {
@@ -187,7 +195,7 @@ export const GamesCatalogView: React.FC<GamesCatalogViewProps> = ({
 
           {currentGame.id === 'three-blocks' && (
             <ThreeTactileBlocksGame
-              onTap={() => setTouchesCount((c) => c + 1)}
+              onTap={executarRegistrarToque}
               onComplete={() => audio.playSuccessArpeggio()}
             />
           )}
