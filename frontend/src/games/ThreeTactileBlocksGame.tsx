@@ -12,7 +12,8 @@ import {
   ArrowDownCircle,
   Trophy,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Wind
 } from 'lucide-react';
 
 interface ThreeTactileBlocksGameProps {
@@ -81,18 +82,11 @@ const TEMAS_DISPONIVEIS: ConfiguracaoTema[] = [
   },
 ];
 
-interface BlocoEmpilhado {
-  posicaoX: number;
-  posicaoY: number;
-  posicaoZ: number;
-  rotacaoZ: number;
-}
-
 export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
   onTap,
   onComplete,
 }) => {
-  // Estados visíveis da interface React
+  // Estados da interface React
   const [faseJogo, setFaseJogo] = useState<'selecao' | 'contagem' | 'jogando' | 'vitoria'>('selecao');
   const [temaEscolhido, setTemaEscolhido] = useState<TipoDeBloco>('edificio');
   const [segundosContagem, setSegundosContagem] = useState(3);
@@ -100,8 +94,9 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
   const [pontosPrecisao, setPontosPrecisao] = useState(100);
   const [mensagemFeedback, setMensagemFeedback] = useState<string | null>(null);
   const [estaEmTelaCheia, setEstaEmTelaCheia] = useState(false);
+  const [balancoVentoPercentual, setBalancoVentoPercentual] = useState(0);
 
-  // Armazenamento estável de callbacks em Refs para evitar desmontar e recriar o Three.js
+  // Armazenamento estável de callbacks em Refs
   const onTapRef = useRef(onTap);
   useEffect(() => {
     onTapRef.current = onTap;
@@ -132,34 +127,34 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
   const grupoGanchoRef = useRef<THREE.Group | null>(null);
   const garraEsquerdaRef = useRef<THREE.Mesh | null>(null);
   const garraDireitaRef = useRef<THREE.Mesh | null>(null);
+  const ultimoBlocoMeshRef = useRef<THREE.Group | null>(null);
 
-  // Referências de Física Realista e Dinâmica
+  // Referências de Física Estilo City Bloxx
   const frameAnimacaoRef = useRef<number | null>(null);
   const tempoInicioRef = useRef<number>(Date.now());
   const blocoSuspensoMeshRef = useRef<THREE.Group | null>(null);
   const cordaLinhaRef = useRef<THREE.Line | null>(null);
   const blocoCaindoRef = useRef<THREE.Group | null>(null);
   const estaCaindoRef = useRef<boolean>(false);
-  const blocosEmpilhadosRef = useRef<BlocoEmpilhado[]>([]);
   const alturaAtualTorreRef = useRef<number>(0);
   const posicaoTopoRef = useRef<{ x: number; z: number }>({ x: 0, z: 0 });
   const cameraYAlvoRef = useRef<number>(3.8);
   const guindasteYAlvoRef = useRef<number>(6.8);
   const temaAtualRef = useRef<TipoDeBloco>('edificio');
 
-  // Vetores de velocidade física do bloco
-  const velocidadeHorizontalRef = useRef<number>(0);
-  const velocidadeVerticalRef = useRef<number>(0);
-  const velocidadeRotacaoRef = useRef<number>(0);
-  const velocidadeOscilacaoInstantaneaRef = useRef<number>(0);
+  // Variáveis para Queda Vertical e Balanço da Torre (Vento)
+  const posicaoQuedaXRef = useRef<number>(0);
+  const velocidadeQuedaVerticalRef = useRef<number>(0);
+  const instabilidadeAcumuladaRef = useRef<number>(0); // Acúmulo de desalinhamento para o sway do vento
 
-  // Dimensões padrão
+  // Dimensões do jogo
   const LARGURA_BLOCO = 2.0;
   const ALTURA_BLOCO = 1.0;
   const PROFUNDIDADE_BLOCO = 2.0;
-  const RAIO_BASE_ESTREITA = 1.35; // Chão reduzido para dificultar
+  const RAIO_BASE_ESTREITA = 1.35; // Base reduzida
+  const COMPRIMENTO_CABO = 2.2; // Comprimento da corda do pêndulo
 
-  // Construtor do Mesh tridimensional do bloco baseado no tema
+  // Construtor estilizado do Mesh do bloco baseado no tema
   const criarMeshDoBloco = useCallback((tema: TipoDeBloco, indiceAndar: number): THREE.Group => {
     const grupo = new THREE.Group();
     const configTema = TEMAS_DISPONIVEIS.find((item) => item.id === tema) || TEMAS_DISPONIVEIS[0];
@@ -250,7 +245,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
       grupo.add(meshMorango);
     }
 
-    // Alça metálica no topo do bloco onde o gancho se acopla
+    // Alça metálica no topo do bloco
     const geometriaAlca = new THREE.TorusGeometry(0.2, 0.04, 8, 16);
     const materialAlca = new THREE.MeshLambertMaterial({ color: 0x4B5563 });
     const meshAlca = new THREE.Mesh(geometriaAlca, materialAlca);
@@ -260,7 +255,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     return grupo;
   }, []);
 
-  // Efeito visual de partículas douradas para alinhamento perfeito
+  // Efeito visual de partículas douradas para alinhamento excelente
   const criarEfeitoParticulas = useCallback((posicaoX: number, posicaoY: number, posicaoZ: number) => {
     if (!cenaRef.current) return;
 
@@ -336,58 +331,54 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
 
     const novoBloco = criarMeshDoBloco(tema, alturaAndar);
     const alturaGuindaste = guindasteYAlvoRef.current;
-    novoBloco.position.set(0, alturaGuindaste - 2.0, 0);
+    novoBloco.position.set(0, alturaGuindaste - COMPRIMENTO_CABO - 0.7, 0);
 
     cenaRef.current.add(novoBloco);
     blocoSuspensoMeshRef.current = novoBloco;
     estaCaindoRef.current = false;
     blocoCaindoRef.current = null;
-    velocidadeHorizontalRef.current = 0;
-    velocidadeVerticalRef.current = 0;
-    velocidadeRotacaoRef.current = 0;
+    velocidadeQuedaVerticalRef.current = 0;
 
-    // Fecha o gancho mecânico ao carregar o novo bloco
+    // Fecha o gancho mecânico ao segurar o novo bloco
     if (garraEsquerdaRef.current && garraDireitaRef.current) {
       garraEsquerdaRef.current.rotation.z = 0;
       garraDireitaRef.current.rotation.z = 0;
     }
   }, [criarMeshDoBloco]);
 
-  // MECÂNICA DE SOLTURA IMEDIATA E FÍSICA REALISTA
+  // MECÂNICA DE SOLTURA: QUEDA LIVRE VERTICAL PURA (Sem empurrão lateral)
   const executarSoltarBloco = useCallback(() => {
     if (faseJogoRef.current !== 'jogando' || estaCaindoRef.current || !blocoSuspensoMeshRef.current) {
       return;
     }
 
-    // Notifica HUD clínico
+    // Registra métrica clínica no HUD
     onTapRef.current();
 
-    // 1. Desconecta o bloco da corda do guindaste
+    // 1. Desconecta o bloco da corda
     const bloco = blocoSuspensoMeshRef.current;
     estaCaindoRef.current = true;
     blocoCaindoRef.current = bloco;
     blocoSuspensoMeshRef.current = null;
 
-    // 2. FÍSICA REALISTA: O bloco herda o vetor tangencial do balanço pendular
-    const velocidadeTangencialAtual = velocidadeOscilacaoInstantaneaRef.current;
-    velocidadeHorizontalRef.current = velocidadeTangencialAtual * 0.36; // Inércia horizontal
-    velocidadeVerticalRef.current = 0.005; // Queda inicial suave com aceleração gravitacional contínua
-    velocidadeRotacaoRef.current = -velocidadeTangencialAtual * 0.02; // Torque de rotação aerodinâmica
+    // 2. Trava a coordenada horizontal X exatamente no ponto em que foi solto (QUEDA LIVRE PURAMENTE VERTICAL)
+    posicaoQuedaXRef.current = bloco.position.x;
+    velocidadeQuedaVerticalRef.current = 0.01; // Velocidade inicial suave para aceleração contínua
+    bloco.rotation.z = 0; // Bloco desce reto e perpendicular
 
-    // 3. Efeito mecânico: As garras do gancho se abrem e o gancho recua
+    // 3. Efeito mecânico: As garras abrem e o gancho recua
     if (garraEsquerdaRef.current && garraDireitaRef.current) {
       garraEsquerdaRef.current.rotation.z = 0.5;
       garraDireitaRef.current.rotation.z = -0.5;
     }
   }, []);
 
-  // Ref estável para a função de soltar bloco
   const executarSoltarBlocoRef = useRef(executarSoltarBloco);
   useEffect(() => {
     executarSoltarBlocoRef.current = executarSoltarBloco;
   }, [executarSoltarBloco]);
 
-  // Iniciar a contagem regressiva de 3 segundos
+  // Contagem regressiva de 3 segundos
   const executarIniciarComContagem = useCallback((tema: TipoDeBloco) => {
     setTemaEscolhido(tema);
     temaAtualRef.current = tema;
@@ -395,11 +386,11 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     faseJogoRef.current = 'contagem';
     setSegundosContagem(3);
     setMensagemFeedback(null);
+    instabilidadeAcumuladaRef.current = 0;
 
     prepararProximoBloco(tema, 0);
   }, [prepararProximoBloco]);
 
-  // Efeito da contagem regressiva de 3 segundos
   useEffect(() => {
     if (faseJogo !== 'contagem') return;
 
@@ -417,11 +408,19 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
         posicaoTopoRef.current = { x: 0, z: 0 };
         cameraYAlvoRef.current = 3.8;
         guindasteYAlvoRef.current = 6.8;
-        blocosEmpilhadosRef.current = [];
+        instabilidadeAcumuladaRef.current = 0;
+        ultimoBlocoMeshRef.current = null;
 
         if (cameraRef.current) {
           cameraRef.current.position.set(0, 3.8, 8.8);
           cameraRef.current.lookAt(0, 2.8, 0);
+        }
+
+        if (grupoTorreRef.current) {
+          while (grupoTorreRef.current.children.length > 0) {
+            grupoTorreRef.current.remove(grupoTorreRef.current.children[0]);
+          }
+          grupoTorreRef.current.rotation.z = 0;
         }
 
         prepararProximoBloco(temaAtualRef.current, 0);
@@ -430,7 +429,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     }
   }, [faseJogo, segundosContagem, prepararProximoBloco]);
 
-  // Suporte a teclado (Barra de Espaço ou Enter para soltar)
+  // Teclado (Espaço ou Enter)
   useEffect(() => {
     const tratarTeclado = (evento: KeyboardEvent) => {
       if (evento.code === 'Space' || evento.key === ' ' || evento.code === 'Enter') {
@@ -445,20 +444,23 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     };
   }, []);
 
-  // Reiniciar torre
+  // Reiniciar jogo
   const executarReiniciar = useCallback(() => {
     if (grupoTorreRef.current) {
       while (grupoTorreRef.current.children.length > 0) {
         grupoTorreRef.current.remove(grupoTorreRef.current.children[0]);
       }
+      grupoTorreRef.current.rotation.z = 0;
     }
 
-    blocosEmpilhadosRef.current = [];
     alturaAtualTorreRef.current = 0;
     posicaoTopoRef.current = { x: 0, z: 0 };
+    instabilidadeAcumuladaRef.current = 0;
+    ultimoBlocoMeshRef.current = null;
     setAlturaTorre(0);
     setPontosPrecisao(100);
     setMensagemFeedback(null);
+    setBalancoVentoPercentual(0);
     cameraYAlvoRef.current = 3.8;
     guindasteYAlvoRef.current = 6.8;
 
@@ -470,24 +472,28 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     prepararProximoBloco(temaAtualRef.current, 0);
   }, [prepararProximoBloco]);
 
-  // Voltar para seleção de tema
+  // Voltar para seleção
   const executarVoltarSelecao = useCallback(() => {
     setFaseJogo('selecao');
     faseJogoRef.current = 'selecao';
     setMensagemFeedback(null);
+    setBalancoVentoPercentual(0);
+    instabilidadeAcumuladaRef.current = 0;
+    ultimoBlocoMeshRef.current = null;
+
     if (grupoTorreRef.current) {
       while (grupoTorreRef.current.children.length > 0) {
         grupoTorreRef.current.remove(grupoTorreRef.current.children[0]);
       }
+      grupoTorreRef.current.rotation.z = 0;
     }
     if (blocoSuspensoMeshRef.current && cenaRef.current) {
       cenaRef.current.remove(blocoSuspensoMeshRef.current);
       blocoSuspensoMeshRef.current = null;
     }
-    blocosEmpilhadosRef.current = [];
   }, []);
 
-  // Alternar Tela Cheia (Fullscreen)
+  // Alternar Tela Cheia
   const executarAlternarTelaCheia = useCallback(() => {
     const container = containerPrincipalRef.current;
     if (!container) return;
@@ -522,7 +528,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     };
   }, []);
 
-  // INICIALIZAÇÃO ÚNICA DA CENA THREE.JS (Array de dependências vazio para evitar recriação)
+  // INICIALIZAÇÃO DA CENA THREE.JS
   useEffect(() => {
     const elementoContainer = montagemRef.current;
     if (!elementoContainer) return;
@@ -541,7 +547,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     camera.lookAt(0, 2.8, 0);
     cameraRef.current = camera;
 
-    // 3. Renderizador WebGL otimizado
+    // 3. Renderizador WebGL
     const renderizador = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     renderizador.setSize(largura, altura);
     renderizador.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -552,7 +558,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     }
     elementoContainer.appendChild(renderizador.domElement);
 
-    // Ouvinte nativo no DOM do Canvas para disparo imediato do toque/clique
+    // Ouvinte nativo no Canvas para disparo imediato
     const domCanvas = renderizador.domElement;
     domCanvas.style.touchAction = 'none';
     const dispararCliqueCanvas = (evento: Event) => {
@@ -561,7 +567,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     };
     domCanvas.addEventListener('pointerdown', dispararCliqueCanvas);
 
-    // 4. Iluminação Clara e Acolhedora
+    // 4. Iluminação
     const luzAmbiente = new THREE.AmbientLight(0xFFFFFF, 1.4);
     cena.add(luzAmbiente);
 
@@ -572,7 +578,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     const luzHemisferio = new THREE.HemisphereLight(0xFFFFFF, 0xE2E8F0, 0.7);
     cena.add(luzHemisferio);
 
-    // 5. Chão / Base Estreita (Diminuída para dificultar)
+    // 5. Chão / Base Estreita
     const geometriaBase = new THREE.CylinderGeometry(RAIO_BASE_ESTREITA, RAIO_BASE_ESTREITA + 0.35, 0.5, 32);
     const materialBase = new THREE.MeshLambertMaterial({ color: 0xDDD3C4 });
     const meshBase = new THREE.Mesh(geometriaBase, materialBase);
@@ -593,8 +599,9 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     meshChaoFundo.position.y = -2.0;
     cena.add(meshChaoFundo);
 
-    // 6. Grupo da Torre
+    // 6. Grupo da Torre (Permite a oscilação harmônica lateral com o vento)
     const grupoTorre = new THREE.Group();
+    grupoTorre.position.set(0, 0, 0); // Ponto de ancoragem no chão
     cena.add(grupoTorre);
     grupoTorreRef.current = grupoTorre;
 
@@ -602,7 +609,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     const materialLinha = new THREE.LineBasicMaterial({ color: 0x374151, linewidth: 3 });
     const geometriaLinha = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0, 6.8, 0),
-      new THREE.Vector3(0, 5.0, 0),
+      new THREE.Vector3(0, 4.6, 0),
     ]);
     const cordaLinha = new THREE.Line(geometriaLinha, materialLinha);
     cena.add(cordaLinha);
@@ -655,40 +662,41 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
     // 10. Prepara o bloco inicial no guindaste
     prepararProximoBloco(temaAtualRef.current, 0);
 
-    // 11. Loop Principal de Animação e Simulação Física
+    // 11. Loop Principal de Animação e Simulação Física (City Bloxx Rules)
     const animar = () => {
       frameAnimacaoRef.current = requestAnimationFrame(animar);
 
       const tempoAtual = (Date.now() - tempoInicioRef.current) * 0.001;
 
-      // Movimentação vertical do guindaste acompanhando a altura da torre
+      // 1. Movimentação vertical do guindaste acompanhando o crescimento da torre
       if (grupoGuindasteVisualRef.current) {
         grupoGuindasteVisualRef.current.position.y = guindasteYAlvoRef.current + 0.2;
       }
 
-      // Parâmetros do balanço pendular
-      const velocidadeOscilacao = 1.9;
-      const amplitudeOscilacao = 2.4;
-      const posicaoBalancoX = Math.sin(tempoAtual * velocidadeOscilacao) * amplitudeOscilacao;
-
-      // Velocidade horizontal instantânea (derivada da posição no tempo)
-      velocidadeOscilacaoInstantaneaRef.current = Math.cos(tempoAtual * velocidadeOscilacao) * (amplitudeOscilacao * velocidadeOscilacao);
-
       const alturaTopoGuindaste = guindasteYAlvoRef.current;
-      const alturaGanchoSuspenso = alturaTopoGuindaste - 1.2;
+
+      // 2. MOVIMENTO PENDULAR SIMPLES (Corda e Guindaste)
+      // O bloco oscila seguindo um arco circular de pêndulo físico simples
+      const velocidadeOscilacao = 1.9;
+      const amplitudeAngulo = 0.85; // Radianos de abertura máxima do pêndulo
+      const anguloPendulo = Math.sin(tempoAtual * velocidadeOscilacao) * amplitudeAngulo;
+
+      // Coordenadas exatas do arco circular: x = L * sin(θ), y = y_topo - L * cos(θ)
+      const posicaoBalancoX = Math.sin(anguloPendulo) * COMPRIMENTO_CABO;
+      const alturaGanchoSuspenso = alturaTopoGuindaste - Math.cos(anguloPendulo) * COMPRIMENTO_CABO;
 
       // Atualiza o gancho mecânico
       if (grupoGanchoRef.current) {
         if (!estaCaindoRef.current) {
           grupoGanchoRef.current.position.set(posicaoBalancoX, alturaGanchoSuspenso, 0);
-          grupoGanchoRef.current.rotation.z = -Math.cos(tempoAtual * velocidadeOscilacao) * 0.08;
+          grupoGanchoRef.current.rotation.z = -anguloPendulo;
         } else {
-          // Recuo do gancho para cima após soltar
+          // Recuo suave do gancho para cima após soltar
           grupoGanchoRef.current.position.y += (alturaTopoGuindaste - 0.4 - grupoGanchoRef.current.position.y) * 0.1;
         }
       }
 
-      // Atualiza a linha do cabo
+      // Atualiza o cabo do guindaste (conecta do topo fixo até a ponta do gancho)
       if (cordaLinhaRef.current && grupoGanchoRef.current) {
         const posicoesCorda = new Float32Array([
           0, alturaTopoGuindaste, 0,
@@ -698,61 +706,98 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
         cordaLinhaRef.current.geometry.attributes.position.needsUpdate = true;
       }
 
-      // BLOCO PRESO NO GUINDASTE: Acompanha o movimento pendular
+      // Bloco preso ao guindaste: acompanha o arco pendular perfeitamente
       if (blocoSuspensoMeshRef.current && !estaCaindoRef.current) {
-        const alturaBlocoSuspenso = alturaGanchoSuspenso - 0.8;
-        blocoSuspensoMeshRef.current.position.set(posicaoBalancoX, alturaBlocoSuspenso, 0);
-        blocoSuspensoMeshRef.current.rotation.z = -Math.cos(tempoAtual * velocidadeOscilacao) * 0.08;
+        blocoSuspensoMeshRef.current.position.set(
+          posicaoBalancoX - Math.sin(anguloPendulo) * 0.7,
+          alturaGanchoSuspenso - Math.cos(anguloPendulo) * 0.7,
+          0
+        );
+        blocoSuspensoMeshRef.current.rotation.z = -anguloPendulo;
       }
 
-      // BLOCO SOLTO: SIMULAÇÃO DE FÍSICA REALISTA NO AR
+      // 3. OSCILAÇÃO HARMÔNICA E VENTO (Balanço da Torre)
+      // Quanto mais desalinhada a torre estiver, maior a amplitude de oscilação harmônica lateral no vento
+      if (grupoTorreRef.current) {
+        const desalinhamentoTotal = instabilidadeAcumuladaRef.current;
+        const totalAndares = alturaAtualTorreRef.current;
+
+        // Amplitude calculada: base estável + fator de instabilidade dos desalinhamentos
+        const amplitudeVento = Math.min(
+          0.14, // Limite máximo para manter jogável
+          0.005 + (desalinhamentoTotal * 0.04) + (totalAndares * 0.003)
+        );
+
+        // Atualiza percentual de vento para HUD
+        const percentualInstabilidade = Math.min(100, Math.round((amplitudeVento / 0.14) * 100));
+        setBalancoVentoPercentual(percentualInstabilidade);
+
+        // Movimento de balanço harmônico em torno da base
+        const anguloSway = Math.sin(tempoAtual * 1.8) * amplitudeVento;
+        grupoTorreRef.current.rotation.z = anguloSway;
+      }
+
+      // 4. QUEDA LIVRE PURAMENTE VERTICAL E DETECÇÃO DE COLISÃO
       if (blocoCaindoRef.current && estaCaindoRef.current) {
         const bloco = blocoCaindoRef.current;
 
-        // Aceleração gravitacional contínua
-        velocidadeVerticalRef.current += 0.012;
-        bloco.position.y -= velocidadeVerticalRef.current;
+        // Queda estritamente vertical: a posição X fica travada no ponto de soltura
+        bloco.position.x = posicaoQuedaXRef.current;
+        bloco.rotation.z = 0; // Desce reto
 
-        // Inércia horizontal do balanço com leve arrasto do ar
-        bloco.position.x += velocidadeHorizontalRef.current;
-        velocidadeHorizontalRef.current *= 0.985;
+        // Aceleração gravitacional vertical constante
+        velocidadeQuedaVerticalRef.current += 0.014;
+        bloco.position.y -= velocidadeQuedaVerticalRef.current;
 
-        // Torque aerodinâmico
-        bloco.rotation.z += velocidadeRotacaoRef.current;
-        velocidadeRotacaoRef.current *= 0.98;
+        // Calcula a posição do topo da torre em coordenadas de mundo (incluindo o balanço do vento!)
+        let centroAlvoMundoX = 0;
+        let alturaAlvoMundoY = 0.5; // Topo da base inicial
 
-        // Altura alvo de pouso (chão ou topo da torre)
-        const alturaAlvoPouso = alturaAtualTorreRef.current * ALTURA_BLOCO;
+        if (alturaAtualTorreRef.current > 0 && ultimoBlocoMeshRef.current) {
+          const vetorPosicaoMundo = new THREE.Vector3();
+          ultimoBlocoMeshRef.current.getWorldPosition(vetorPosicaoMundo);
+          centroAlvoMundoX = vetorPosicaoMundo.x;
+          alturaAlvoMundoY = vetorPosicaoMundo.y + ALTURA_BLOCO;
+        }
 
-        if (bloco.position.y <= alturaAlvoPouso + ALTURA_BLOCO / 2) {
-          // Atingiu o plano de suporte
-          bloco.position.y = alturaAlvoPouso + ALTURA_BLOCO / 2;
+        // Colisão ao atingir a superfície do andar imediatamente inferior
+        if (bloco.position.y <= alturaAlvoMundoY) {
+          bloco.position.y = alturaAlvoMundoY;
 
-          const posicaoBlocoX = bloco.position.x;
-          const centroAlvoX = alturaAtualTorreRef.current === 0 ? 0 : posicaoTopoRef.current.x;
-          const deslocamento = posicaoBlocoX - centroAlvoX;
-          const diferencaDistancia = Math.abs(deslocamento);
+          const deslocamentoMundo = bloco.position.x - centroAlvoMundoX;
+          const diferencaDistancia = Math.abs(deslocamentoMundo);
 
-          // Tolerância física de apoio
-          const limiteApoio = alturaAtualTorreRef.current === 0 
-            ? RAIO_BASE_ESTREITA * 0.75  // Chão estreito mais exigente
-            : LARGURA_BLOCO * 0.48;       // Topo do bloco anterior
+          // Margem mínima de contato: se o bloco tocar ao menos 15% da superfície abaixo, ele apoia!
+          // Largura total do bloco é 2.0 -> com distância de até 1.70 há sobreposição real
+          const limiteApoioMinimo = alturaAtualTorreRef.current === 0 
+            ? RAIO_BASE_ESTREITA * 0.85 
+            : LARGURA_BLOCO * 0.85;
 
-          if (diferencaDistancia <= limiteApoio) {
-            // ENCAIXE VÁLIDO E ESTÁVEL
-            const encaixePerfeito = diferencaDistancia < 0.22;
+          if (diferencaDistancia <= limiteApoioMinimo) {
+            // 5. FÍSICA NÃO-REALISTA DE EMPILHAMENTO (Blocos Grudados / Estilo City Bloxx)
+            // O bloco fica permanentemente grudado à estrutura da torre na posição em que tocou!
+            const encaixePerfeito = diferencaDistancia < 0.25;
 
             if (encaixePerfeito) {
               setMensagemFeedback('Perfeito! Alinhamento 100%!');
-              criarEfeitoParticulas(posicaoBlocoX, alturaAlvoPouso + ALTURA_BLOCO, 0);
-            } else if (diferencaDistancia < 0.5) {
-              setMensagemFeedback('Muito bom! Torre firme!');
+              criarEfeitoParticulas(bloco.position.x, alturaAlvoMundoY + ALTURA_BLOCO / 2, 0);
+            } else if (diferencaDistancia < 0.65) {
+              setMensagemFeedback('Muito bom! Torre crescendo!');
             } else {
-              setMensagemFeedback('Equilibrado no limite!');
+              setMensagemFeedback('Belo encaixe! A torre balança no vento!');
+            }
+
+            // Transfere o bloco para o grupo da torre (para que ele passe a oscilar junto com o vento!)
+            if (grupoTorreRef.current) {
+              // Converte as coordenadas de mundo para as coordenadas locais do grupo da torre
+              grupoTorreRef.current.worldToLocal(bloco.position);
+              bloco.rotation.z = 0; // Alinhado com o eixo da torre
+              grupoTorreRef.current.add(bloco);
+              ultimoBlocoMeshRef.current = bloco;
             }
 
             // Squash & stretch de impacto
-            bloco.scale.set(1.08, 0.86, 1.08);
+            bloco.scale.set(1.06, 0.88, 1.06);
             let framesDeformacao = 6;
             const restaurarEscala = () => {
               if (framesDeformacao <= 0) {
@@ -767,20 +812,18 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
             };
             restaurarEscala();
 
-            // Inclinação permanente baseada no torque do deslocamento
-            bloco.rotation.z = -deslocamento * 0.04;
-
-            if (grupoTorreRef.current) {
-              grupoTorreRef.current.add(bloco);
-            }
-
+            // Atualiza andares e pontuação
             const novoAndar = alturaAtualTorreRef.current + 1;
             alturaAtualTorreRef.current = novoAndar;
             setAlturaTorre(novoAndar);
-            posicaoTopoRef.current = { x: posicaoBlocoX, z: 0 };
+            posicaoTopoRef.current = { x: bloco.position.x, z: 0 };
 
+            // Acumula instabilidade gerada pelo desalinhamento deste bloco
+            instabilidadeAcumuladaRef.current += diferencaDistancia;
+
+            // Precisão média
             setPontosPrecisao((precisaoAnterior) => {
-              const precisaoDesteBloco = Math.max(50, Math.round(100 - (diferencaDistancia / limiteApoio) * 45));
+              const precisaoDesteBloco = Math.max(50, Math.round(100 - (diferencaDistancia / limiteApoioMinimo) * 45));
               return Math.round((precisaoAnterior * (novoAndar - 1) + precisaoDesteBloco) / novoAndar);
             });
 
@@ -799,31 +842,25 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
             }, 350);
 
           } else {
-            // DESEQUILÍBRIO REALISTA: Tomba pela borda e cai no abismo
-            setMensagemFeedback('Desequilibrou! O guindaste trouxe outro bloco.');
+            // ERROU O BLOCO (Cai no abismo em linha reta vertical)
+            setMensagemFeedback('Passou direto! Tente o próximo andar com calma.');
             
             const blocoQueda = bloco;
             estaCaindoRef.current = false;
             blocoCaindoRef.current = null;
 
-            let velocidadeTombamentoY = 0.04;
-            let velocidadeTombamentoX = deslocamento > 0 ? 0.07 : -0.07;
-            let torqueAngular = deslocamento > 0 ? -0.12 : 0.12;
-
-            const animarTombamento = () => {
-              if (blocoQueda.position.y < -8.0 || !cenaRef.current) {
+            // Continua caindo verticalmente até o abismo
+            const animarQuedaAbismo = () => {
+              if (blocoQueda.position.y < -12.0 || !cenaRef.current) {
                 if (cenaRef.current && blocoQueda) {
                   cenaRef.current.remove(blocoQueda);
                 }
                 return;
               }
-              velocidadeTombamentoY += 0.018;
-              blocoQueda.position.y -= velocidadeTombamentoY;
-              blocoQueda.position.x += velocidadeTombamentoX;
-              blocoQueda.rotation.z += torqueAngular;
-              requestAnimationFrame(animarTombamento);
+              blocoQueda.position.y -= 0.2;
+              requestAnimationFrame(animarQuedaAbismo);
             };
-            animarTombamento();
+            animarQuedaAbismo();
 
             setTimeout(() => {
               prepararProximoBloco(temaAtualRef.current, alturaAtualTorreRef.current);
@@ -832,7 +869,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
         }
       }
 
-      // Câmera acompanha o crescimento da torre
+      // Câmera acompanha o topo suavemente
       if (cameraRef.current) {
         cameraRef.current.position.y += (cameraYAlvoRef.current - cameraRef.current.position.y) * 0.05;
         cameraRef.current.lookAt(0, cameraYAlvoRef.current - 1.0, 0);
@@ -843,7 +880,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
 
     animar();
 
-    // ResizeObserver para manter resolução exata em fullscreen e redimensionamento
+    // ResizeObserver
     const observador = new ResizeObserver((entradas) => {
       for (const entrada of entradas) {
         const { width: novaLargura, height: novaAltura } = entrada.contentRect;
@@ -938,7 +975,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
         </div>
       </div>
 
-      {/* Painel de Estatísticas Superior (ativo durante o jogo) */}
+      {/* Painel de Estatísticas Superior com Indicador de Vento/Balanço da Torre */}
       {faseJogo === 'jogando' && (
         <div className="w-full flex items-center justify-between px-3.5 py-2.5 bg-[#F7F3EE] rounded-2xl border border-[#EDE4DA] text-xs font-bold text-[#475569] my-2">
           <div className="flex items-center gap-2">
@@ -954,6 +991,13 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
               <CheckCircle2 className="w-4 h-4 text-[#2D6A4F]" />
               <span className="text-sm">Andares: {alturaTorre}</span>
             </div>
+
+            {/* Indicador de Oscilação/Vento da Torre */}
+            <div className="hidden sm:flex items-center gap-1.5 text-[#D97706]">
+              <Wind className="w-4 h-4 text-[#D97706]" />
+              <span>Instabilidade: {balancoVentoPercentual}%</span>
+            </div>
+
             <div className="flex items-center gap-1.5 text-[#3E8EBF]">
               <Sparkles className="w-4 h-4 text-[#3E8EBF]" />
               <span className="text-sm">Precisão: {pontosPrecisao}%</span>
@@ -965,7 +1009,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
       {/* Área Principal do Jogo com Canvas Three.js */}
       <div className="w-full flex-1 flex flex-col relative my-1 min-h-0">
         
-        {/* Contêiner do Canvas WebGL 3D com ativação por PointerDown para resposta imediata */}
+        {/* Contêiner do Canvas WebGL 3D */}
         <div
           className={`w-full rounded-3xl overflow-hidden border-2 border-[#EDE4DA] shadow-inner bg-[#F4F1EA] relative cursor-pointer touch-none ${
             estaEmTelaCheia ? 'flex-1 h-full min-h-[60vh]' : 'h-[460px] sm:h-[540px] lg:h-[580px]'
