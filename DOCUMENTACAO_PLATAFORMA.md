@@ -119,3 +119,4 @@ A **PsicoPlay** é uma plataforma terapêutica digital e clínica desenvolvida e
 - **Propriedade Intelectual:** Todos os direitos reservados.
 - **Idealizador e Desenvolvedor:** Gabriel Giraldelli Santos
 - **E-mail de Contato Profissional:** giraldelli.studio@gmail.com
+
