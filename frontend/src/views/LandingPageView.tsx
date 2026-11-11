@@ -104,16 +104,16 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     },
     {
       id: 'three-blocks',
-      titulo: 'Oficina Sensorial 3D Interativa',
-      categoria: 'Renderização Espacial 3D',
-      selo: 'Espacialidade & Serenidade',
+      titulo: 'Oficina Sensorial 3D: Torre com Guindaste',
+      categoria: 'Renderização Espacial 3D (Three.js)',
+      selo: 'Timing Motor & Espacialidade',
       corSelo: 'bg-[#F7F3EE] text-[#6D4C41] border-[#EDE4DA]',
       icone: Brain,
       comoFunciona:
-        'Formas tridimensionais suaves (cubos, esferas e cilindros) em Three.js que a criança pode girar, aproximar e explorar no espaço virtual.',
+        'Inspirado no clássico City Bloxx com Three.js: um guindaste oscila blocos 3D temáticos (edifícios, árvores, castelos ou confeitos) e a criança toca para soltar e empilhar a torre.',
       paraQueServe:
-        'Estimula a percepção de profundidade tridimensional e exploração tátil-visual com iluminação relaxante e ausência de pressões de tempo.',
-      habilidades: ['Orientação Espacial', 'Exploração Tátil-Visual', 'Calmante Cognitivo'],
+        'Treina o planejamento motor, percepção de profundidade tridimensional, noções de equilíbrio e tolerância à frustração com feedback acolhedor.',
+      habilidades: ['Timing Motor', 'Percepção de Profundidade 3D', 'Foco Atencional'],
     },
   ];
 

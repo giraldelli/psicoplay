@@ -109,13 +109,13 @@ export const GamesCatalogView: React.FC<GamesCatalogViewProps> = ({
     },
     {
       id: 'three-blocks' as GameIdentifier,
-      title: 'Oficina Sensorial 3D (Three.js)',
+      title: 'Oficina Sensorial 3D: Torre de Blocos',
       category: 'three' as const,
-      categoryLabel: 'Renderização Espacial 3D',
-      badge: 'Espacialidade & Calmaria',
+      categoryLabel: 'Renderização Espacial 3D (Three.js)',
+      badge: 'Coordenação Visual-Motora & Espaço',
       badgeColor: 'bg-[#F7F3EE] text-[#6D4C41] border-[#EDE4DA]',
-      description: 'Cubos, cilindros e esferas 3D suaves e táteis para girar no espaço e explorar volume.',
-      clinicalGoal: 'Percepção de profundidade tridimensional com paleta relaxante e iluminação calorosa.',
+      description: 'Jogo estilo City Bloxx em Three.js: guindaste oscilante onde o paciente toca para empilhar edifícios, árvores, castelos ou bolos.',
+      clinicalGoal: 'Timing de resposta motora, percepção de profundidade tridimensional, foco atencional e autorregulação.',
       icon: Box,
     },
   ];
