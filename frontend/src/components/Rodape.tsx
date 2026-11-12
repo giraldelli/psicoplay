@@ -1,5 +1,5 @@
 import React from 'react';
-import { HeartHandshake, Mail, User, Sparkles, Shield, Heart } from 'lucide-react';
+import { HeartHandshake, Mail, User, Shield, Heart } from 'lucide-react';
 
 export const Rodape: React.FC = () => {
   const anoAtual = new Date().getFullYear();
@@ -20,9 +20,6 @@ export const Rodape: React.FC = () => {
               <div>
                 <span className="font-extrabold text-xl tracking-tight text-[#1E293B]">
                   Psico<span className="text-[#3E8EBF]">Play</span>
-                </span>
-                <span className="ml-2 inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#E8F8F2] text-[#2D6A4F]">
-                  <Sparkles className="w-2.5 h-2.5 text-[#4FA88E]" /> Clínica
                 </span>
               </div>
             </div>

@@ -148,9 +148,6 @@ export const DirectTouchBalloonsGame: React.FC<DirectTouchBalloonsGameProps> = (
       {/* Header */}
       <div className="w-full flex items-center justify-between pb-3 border-b border-[#EDE4DA]">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider uppercase text-[#2D6A4F] bg-[#E8F8F2] px-2.5 py-0.5 rounded-full inline-block mb-1">
-            Causa e Efeito • Toque Direto
-          </span>
           <h2 className="text-xl font-bold text-[#1E293B]">
             Estouro Suave & Revelação de Personagens
           </h2>

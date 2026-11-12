@@ -85,9 +85,6 @@ export const WoodenPegPuzzleGame: React.FC<WoodenPegPuzzleGameProps> = ({
       {/* Header */}
       <div className="w-full flex items-center justify-between pb-3 border-b border-[#EDE4DA]">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider uppercase text-[#D97706] bg-[#FEF3C7] px-2.5 py-0.5 rounded-full inline-block mb-1">
-            Encaixe Único & Apoio Visual
-          </span>
           <h2 className="text-xl font-bold text-[#1E293B]">
             Quebra-cabeças de Madeira com Pino
           </h2>

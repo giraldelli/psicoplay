@@ -5,7 +5,6 @@ import {
   Gamepad2,
   TrendingUp,
   Clock,
-  Sparkles,
   ArrowRight,
   Brain,
   Plus,
@@ -89,10 +88,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-white via-[#FCFBF9] to-[#E8F8F2]/60 p-6 sm:p-8 border border-[#EDE4DA] shadow-xs">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="max-w-2xl space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#E8F8F2] text-[#2D6A4F] border border-[#A8E6CF]">
-              <Sparkles className="w-3.5 h-3.5 text-[#4FA88E]" />
-              <span>Ambiente Psicopedagógico PsicoPlay</span>
-            </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1E293B] tracking-tight">
               {hasPatients ? 'Painel de Atendimentos Clínicos' : 'Bem-vindo ao PsicoPlay!'}
             </h1>

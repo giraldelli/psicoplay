@@ -116,9 +116,6 @@ export const RealObjectAssociationGame: React.FC<RealObjectAssociationGameProps>
       {/* Header */}
       <div className="w-full flex items-center justify-between pb-3 border-b border-[#EDE4DA]">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider uppercase text-[#5E35B1] bg-[#EDE7F6] px-2.5 py-0.5 rounded-full inline-block mb-1">
-            Associação de Figuras Reais
-          </span>
           <h2 className="text-xl font-bold text-[#1E293B]">
             Objetos do Cotidiano & Suas Funções
           </h2>

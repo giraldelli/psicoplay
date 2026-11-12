@@ -6,7 +6,6 @@ import {
   ClipboardList,
   CalendarDays,
   BarChart3,
-  Sparkles,
   HeartHandshake,
   Compass,
 } from 'lucide-react';
@@ -80,9 +79,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="flex items-center gap-1.5">
                 <span className="font-extrabold text-xl tracking-tight text-[#1E293B]">
                   Psico<span className="text-[#3E8EBF]">Play</span>
-                </span>
-                <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#E8F8F2] text-[#2D6A4F]">
-                  <Sparkles className="w-3 h-3 text-[#4FA88E]" /> Clínica
                 </span>
               </div>
               <p className="text-xs text-[#64748B] font-medium hidden sm:block">

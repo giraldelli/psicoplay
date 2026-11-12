@@ -76,9 +76,6 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
     return (
       <div className="space-y-6 max-w-7xl mx-auto pb-12 animate-fade-in">
         <div className="pb-4 border-b border-[#EDE4DA]">
-          <span className="text-[11px] font-extrabold tracking-wider uppercase text-[#2D6A4F] bg-[#E8F8F2] px-2.5 py-0.5 rounded-full inline-block mb-1">
-            Avaliação & Prontuário Evolutivo
-          </span>
           <h1 className="text-2xl font-extrabold text-[#1E293B]">
             Relatórios de Evolução Psicopedagógica
           </h1>
@@ -106,9 +103,6 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#EDE4DA]">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider uppercase text-[#2D6A4F] bg-[#E8F8F2] px-2.5 py-0.5 rounded-full inline-block mb-1">
-            Avaliação & Prontuário Evolutivo
-          </span>
           <h1 className="text-2xl font-extrabold text-[#1E293B]">
             Relatórios de Evolução Psicopedagógica
           </h1>

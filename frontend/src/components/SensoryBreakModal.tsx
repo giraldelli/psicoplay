@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Wind, Sun, Heart, Check } from 'lucide-react';
+import { X, Wind, Sun, Heart, Check } from 'lucide-react';
 import { audio } from './AudioService.ts';
 
 interface SensoryBreakModalProps {
@@ -57,12 +57,6 @@ export const SensoryBreakModal: React.FC<SensoryBreakModalProps> = ({ isOpen, on
         >
           <X className="w-5 h-5" />
         </button>
-
-        {/* Sensory badge */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E8F8F2] text-[#2D6A4F] text-xs font-bold mb-4">
-          <Sparkles className="w-3.5 h-3.5 text-[#4FA88E]" />
-          <span>Espaço de Regulação Sensorial</span>
-        </div>
 
         <h2 className="text-xl font-extrabold text-[#1E293B] mb-1">
           Momento de Respiração & Calma

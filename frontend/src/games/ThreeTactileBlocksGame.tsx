@@ -948,9 +948,6 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
       {/* Cabeçalho do Jogo */}
       <div className="w-full flex items-center justify-between pb-3 border-b border-[#EDE4DA]">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider uppercase text-[#3E8EBF] bg-[#D4ECF9] px-2.5 py-0.5 rounded-full inline-block mb-1">
-            Oficina Sensorial 3D • Estilo City Bloxx
-          </span>
           <h2 className="text-xl sm:text-2xl font-bold text-[#1E293B] flex items-center gap-2">
             Torre Tridimensional com Guindaste
           </h2>
@@ -1073,9 +1070,6 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
           {faseJogo === 'selecao' && (
             <div className="absolute inset-0 bg-[#FCFBF9]/95 backdrop-blur-sm z-30 flex flex-col items-center justify-center p-4 sm:p-6 animate-fade-in">
               <div className="text-center max-w-lg mb-6">
-                <span className="text-xs font-bold text-[#2D6A4F] bg-[#E8F8F2] px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-2">
-                  Escolha o seu Estilo
-                </span>
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-[#1E293B]">
                   Qual tipo de bloco você quer empilhar?
                 </h3>

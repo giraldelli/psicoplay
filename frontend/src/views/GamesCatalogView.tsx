@@ -223,9 +223,6 @@ export const GamesCatalogView: React.FC<GamesCatalogViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#EDE4DA]">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider uppercase text-[#3E8EBF] bg-[#D4ECF9] px-2.5 py-0.5 rounded-full inline-block mb-1">
-            Biblioteca Terapêutica Interativa
-          </span>
           <h1 className="text-2xl font-extrabold text-[#1E293B]">
             Jogos Digitais Terapêuticos
           </h1>

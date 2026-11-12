@@ -84,9 +84,6 @@ export const DigitalColoringGame: React.FC<DigitalColoringGameProps> = ({
       {/* Header */}
       <div className="w-full flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#EDE4DA]">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider uppercase text-[#3E8EBF] bg-[#D4ECF9] px-2.5 py-0.5 rounded-full inline-block mb-1">
-            Colorir Digital Adaptado
-          </span>
           <h2 className="text-xl font-bold text-[#1E293B]">
             Pintura Mágica por Toque
           </h2>

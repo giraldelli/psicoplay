@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Sparkles,
   Gamepad2,
   HeartHandshake,
   Brain,
@@ -157,12 +156,6 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-6">
             
-            {/* Badge de Destaque */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E8F8F2] border border-[#A8E6CF] text-[#2D6A4F] text-xs sm:text-sm font-bold shadow-xs">
-              <Sparkles className="w-4 h-4 text-[#4FA88E]" />
-              <span>Plataforma para Profissionais da Saúde e Educação & Jogos Terapêuticos</span>
-            </div>
-
             {/* Título Principal */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1E293B] tracking-tight leading-[1.15]">
               Acolhimento, ciência e afeto no{' '}
@@ -362,8 +355,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
 
                   {/* Rodapé do Card */}
                   <div className="pt-6 mt-6 border-t border-[#F1F5F9] flex items-center justify-between text-xs text-[#64748B]">
-                    <span className="flex items-center gap-1 font-semibold text-[#3E8EBF]">
-                      <Sparkles className="w-3.5 h-3.5" /> Exclusivo do Terapeuta
+                    <span className="font-semibold text-[#3E8EBF]">
+                      Exclusivo do Terapeuta
                     </span>
                     <span className="text-[11px] text-[#94A3B8]">Disponível após login</span>
                   </div>
@@ -457,7 +450,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   Os prontuários, relatórios e métricas de desempenho dos seus pacientes são confidenciais e protegidos. Cada terapeuta autenticado possui visualização dedicada às suas intervenções e sessões.
                 </p>
                 <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#EDE4DA] flex items-center gap-2.5 text-xs text-[#64748B]">
-                  <Sparkles className="w-4 h-4 text-[#3E8EBF] shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[#3E8EBF] shrink-0" />
                   <span>Suporte a crianças verbais e não verbais com estímulos personalizados.</span>
                 </div>
               </div>

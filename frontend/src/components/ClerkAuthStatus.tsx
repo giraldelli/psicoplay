@@ -6,7 +6,7 @@ import {
   UserButton,
   useUser,
 } from '@clerk/clerk-react';
-import { LogIn, ShieldAlert, Sparkles } from 'lucide-react';
+import { LogIn, ShieldAlert } from 'lucide-react';
 
 interface ClerkAuthStatusProps {
   isConfigured: boolean;
@@ -66,7 +66,6 @@ const ClerkUserInfo: React.FC = () => {
         <span className="text-[10px] uppercase font-bold text-[#64748B] tracking-wider leading-none">
           Terapeuta
         </span>
-        <Sparkles className="w-2.5 h-2.5 text-[#4FA88E]" />
       </div>
       <span className="text-xs font-bold text-[#1E293B] block leading-tight">
         {primeiroNome}

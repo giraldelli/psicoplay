@@ -81,9 +81,6 @@ export const SessionsView: React.FC<SessionsViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#EDE4DA]">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider uppercase text-[#5E35B1] bg-[#EDE7F6] px-2.5 py-0.5 rounded-full inline-block mb-1">
-            Prontuário de Atendimentos
-          </span>
           <h1 className="text-2xl font-extrabold text-[#1E293B]">
             Registro de Sessões Clínicas
           </h1>

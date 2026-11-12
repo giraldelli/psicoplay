@@ -125,9 +125,6 @@ export const ColorShapeMatchingGame: React.FC<ColorShapeMatchingGameProps> = ({
       {/* Game Mode Selector Header */}
       <div className="w-full flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#EDE4DA]">
         <div>
-          <span className="text-[11px] font-extrabold tracking-wider uppercase text-[#3E8EBF] bg-[#D4ECF9]/60 px-2.5 py-0.5 rounded-full inline-block mb-1">
-            Pareamento e Classificação
-          </span>
           <h2 className="text-xl font-bold text-[#1E293B]">
             {mode === 'cor' ? 'Separar por Cores' : 'Encaixar por Formas'}
           </h2>
