@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 
 interface ThreeTactileBlocksGameProps {
+  temaInicial?: TipoDeBloco;
   onTap: () => void;
   onComplete: () => void;
 }
@@ -84,12 +85,15 @@ const TEMAS_DISPONIVEIS: ConfiguracaoTema[] = [
 ];
 
 export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
+  temaInicial,
   onTap,
   onComplete,
 }) => {
   // Estados da interface React
-  const [faseJogo, setFaseJogo] = useState<'selecao' | 'contagem' | 'jogando' | 'queda_torre' | 'vitoria'>('selecao');
-  const [temaEscolhido, setTemaEscolhido] = useState<TipoDeBloco>('edificio');
+  const [faseJogo, setFaseJogo] = useState<'selecao' | 'contagem' | 'jogando' | 'queda_torre' | 'vitoria'>(
+    temaInicial ? 'contagem' : 'selecao'
+  );
+  const [temaEscolhido, setTemaEscolhido] = useState<TipoDeBloco>(temaInicial || 'edificio');
   const [segundosContagem, setSegundosContagem] = useState(3);
   const [alturaTorre, setAlturaTorre] = useState(0);
   const [pontosPrecisao, setPontosPrecisao] = useState(100);
@@ -139,7 +143,7 @@ export const ThreeTactileBlocksGame: React.FC<ThreeTactileBlocksGameProps> = ({
   const estaCaindoRef = useRef<boolean>(false);
   const alturaAtualTorreRef = useRef<number>(0);
   const posicaoTopoRef = useRef<{ x: number; z: number }>({ x: 0, z: 0 });
-  const temaAtualRef = useRef<TipoDeBloco>('edificio');
+  const temaAtualRef = useRef<TipoDeBloco>(temaInicial || 'edificio');
 
   // Câmera dinâmica e Guindaste com recuo progressivo (Zoom-Out)
   const cameraYAlvoRef = useRef<number>(2.4);

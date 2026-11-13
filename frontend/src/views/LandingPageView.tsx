@@ -25,7 +25,7 @@ import { isClerkConfigured } from '../utils/clerkConfig.ts';
 import { audio } from '../components/AudioService.ts';
 
 interface LandingPageViewProps {
-  onAcessarAreaTerapeuta: () => void;
+  onAcessarAreaTerapeuta: (categoriaJogoId?: string) => void;
   isAutenticado: boolean;
 }
 
@@ -44,10 +44,11 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       corSelo: 'bg-[#E8F8F2] text-[#2D6A4F] border-[#A8E6CF]',
       icone: Layers,
       comoFunciona:
-        'A criança separa blocos coloridos nas caixas correspondentes ou encaixa formas geométricas básicas com contraste suave.',
+        'A criança separa blocos nas caixas correspondentes. Ao iniciar, o terapeuta escolhe entre classificar por cores, formas, tamanhos ou desafio combinado.',
       paraQueServe:
         'Estimula a categorização mental, a percepção de semelhanças e diferenças e a flexibilidade cognitiva, sem gerar sobrecarga sensorial.',
       habilidades: ['Discriminação Visual', 'Atenção Seletiva', 'Raciocínio Lógico'],
+      resumoConteudos: '4 modos no jogo',
     },
     {
       id: 'real-objects',
@@ -57,62 +58,67 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       corSelo: 'bg-[#D4ECF9] text-[#1E3A8A] border-[#A0D2EB]',
       icone: Eye,
       comoFunciona:
-        'Combina fotografias e ilustrações de objetos do mundo real (escova, colher, sapato) ao seu contexto de uso diário.',
+        'Combina objetos do mundo real ao seu contexto de uso diário, com seleção de tema ao iniciar (Alimentação, Higiene, Vestuário ou Escola).',
       paraQueServe:
         'Apoia a comunicação funcional, a expansão de vocabulário ativo e a aplicação prática de conceitos na rotina da criança.',
       habilidades: ['Comunicação Funcional', 'Vocabulário Ativo', 'Autonomia Prática'],
+      resumoConteudos: '4 temas de rotina',
     },
     {
       id: 'wooden-puzzle',
-      titulo: 'Quebra-cabeças com Pino de Madeira',
+      titulo: 'Quebra-cabeças de Encaixe Único',
       categoria: 'Encaixe e Percepção',
       selo: 'Coordenação Óculo-Manual',
       corSelo: 'bg-[#FEF3C7] text-[#92400E] border-[#FDE68A]',
       icone: Box,
       comoFunciona:
-        'Peças inspiradas em madeira maciça com pinos de pegada realista para encaixe exato na silhueta correspondente.',
+        'Tabuleiro de madeira maciça com pinos de pegada, onde é possível escolher o tema ao iniciar (Animais & Veículos, Fazenda, Frutas ou Instrumentos).',
       paraQueServe:
         'Promove a coordenação óculo-manual, o movimento de pinça visualizado, percepção de contornos e fechamento gestáltico.',
       habilidades: ['Controle Motor Fino', 'Noção Espacial', 'Fechamento Visual'],
+      resumoConteudos: '4 tabuleiros no jogo',
     },
     {
       id: 'balloons',
-      titulo: 'Toque Direto: Balões Sensoriais',
+      titulo: 'Jogos de Toque Direto',
       categoria: 'Causa e Efeito Adaptada',
       selo: 'Previsibilidade & TEA',
       corSelo: 'bg-[#EDE7F6] text-[#5E35B1] border-[#D1C4E9]',
       icone: Touchpad,
       comoFunciona:
-        'Balões em tons pastéis flutuam suavemente na tela. Ao toque da criança, estouram com confetes delicados e animação acolhedora.',
+        'Jogo de resposta imediata ao toque, permitindo escolher o cenário ao iniciar: Balões Pastéis, Bolhas no Mar, Nuvens Mágicas ou Jardim de Flores.',
       paraQueServe:
         'Desenvolve a compreensão de causa e efeito elementar, rastreamento visual e regulação emocional positiva, sem sons estridentes ou sustos.',
       habilidades: ['Causa e Efeito', 'Rastreamento Ocular', 'Regulação Emocional'],
+      resumoConteudos: '4 cenários no jogo',
     },
     {
       id: 'digital-coloring',
-      titulo: 'Pintura & Colorir Digital Acolhedor',
+      titulo: 'Jogos de Colorir Digital',
       categoria: 'Expressão e Relaxamento',
       selo: 'Preenchimento Automático',
       corSelo: 'bg-[#FCE7F3] text-[#9D174D] border-[#FBCFE8]',
       icone: Palette,
       comoFunciona:
-        'Basta tocar nas áreas do desenho para que se preencham suavemente de cor, sem necessidade de traço contínuo perfeito.',
+        'Pintura mágica por toque sem risco de borrar. Ao iniciar o jogo, escolha entre Dinossauro, Borboleta, Viagem Espacial ou Casinha Feliz.',
       paraQueServe:
         'Proporciona relaxamento sensorial, foco atencional e sensação de agência criativa, eliminando a frustração da coordenação motora fina incompleta.',
       habilidades: ['Autorregulação Sensorial', 'Foco Atencional', 'Autoestima Criativa'],
+      resumoConteudos: '4 desenhos no jogo',
     },
     {
       id: 'three-blocks',
-      titulo: 'Oficina Sensorial 3D: Torre com Guindaste',
+      titulo: 'Oficina Sensorial 3D',
       categoria: 'Renderização Espacial 3D (Three.js)',
       selo: 'Timing Motor & Espacialidade',
       corSelo: 'bg-[#F7F3EE] text-[#6D4C41] border-[#EDE4DA]',
       icone: Brain,
       comoFunciona:
-        'Inspirado no clássico City Bloxx com Three.js: um guindaste oscila blocos 3D temáticos (edifícios, árvores, castelos ou confeitos) e a criança toca para soltar e empilhar a torre.',
+        'Página dedicada ao jogo do guindaste 3D, onde ao iniciar é possível escolher qual tipo de bloco construir (Prédio, Árvore, Castelo ou Doces).',
       paraQueServe:
         'Treina o planejamento motor, percepção de profundidade tridimensional, noções de equilíbrio e tolerância à frustração com feedback acolhedor.',
       habilidades: ['Timing Motor', 'Percepção de Profundidade 3D', 'Foco Atencional'],
+      resumoConteudos: '4 temas de blocos no guindaste',
     },
   ];
 
@@ -355,10 +361,17 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
 
                   {/* Rodapé do Card */}
                   <div className="pt-6 mt-6 border-t border-[#F1F5F9] flex items-center justify-between text-xs text-[#64748B]">
-                    <span className="font-semibold text-[#3E8EBF]">
-                      Exclusivo do Terapeuta
-                    </span>
-                    <span className="text-[11px] text-[#94A3B8]">Disponível após login</span>
+                    <button
+                      onClick={() => {
+                        audio.playSoftTap();
+                        onAcessarAreaTerapeuta(jogo.id);
+                      }}
+                      className="font-bold text-[#3E8EBF] hover:text-[#2C6E96] flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>Abrir página {jogo.titulo}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-[11px] text-[#94A3B8]">{jogo.resumoConteudos}</span>
                   </div>
 
                 </div>

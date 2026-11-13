@@ -152,9 +152,14 @@ export default function App() {
         /* Página Inicial com Introdução da Plataforma, Apresentação dos Jogos e Funcionalidades */
         <main className="flex-1 w-full relative z-10">
           <LandingPageView
-            onAcessarAreaTerapeuta={() => {
+            onAcessarAreaTerapeuta={(categoriaJogoId) => {
               setModoVisualizacao('clinico');
-              setAbaAtiva('dashboard');
+              if (categoriaJogoId) {
+                setJogoAlvoParaAbrir(categoriaJogoId);
+                setAbaAtiva('games');
+              } else {
+                setAbaAtiva('dashboard');
+              }
             }}
             isAutenticado={isAutenticado}
           />
